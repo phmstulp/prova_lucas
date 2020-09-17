@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1046856088505",
+    "firebase_url": "https://prova-lucas-1609.firebaseio.com",
+    "project_id": "prova-lucas-1609",
+    "storage_bucket": "prova-lucas-1609.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046856088505:android:15598c6eff7b469c2f5468",
+        "android_client_info": {
+          "package_name": "com.example.provalucas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1046856088505-vdkhppp3ev4ii1qvm8b1n7qqncph6plb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAo7Ox_yHDPRxKGTicVsMMG2q1sC5NhzuQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1046856088505-vdkhppp3ev4ii1qvm8b1n7qqncph6plb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
