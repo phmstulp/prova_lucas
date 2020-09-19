@@ -7,13 +7,14 @@ class Sintomas {
   bool _tosse;
   bool _espirro;
   String _descricao;
-  String _urlImagem;
+  List<String> urlImagens;
   String _temperatura;
 
   Sintomas();
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
+      "protocolo": this.protocolo,
       "idUsuario": this.idUsuario,
       "febre": this.febre,
       "diarreia": this.diarreia,
@@ -21,8 +22,8 @@ class Sintomas {
       "tosse": this.tosse,
       "espirro": this.espirro,
       "descricao": this.descricao,
-      "urlImagem": this.urlImagem,
-      "temperatura": this.temperatura
+      "temperatura": this.temperatura,
+      "urlImagens": this.urlImagens
     };
 
     return map;
@@ -32,12 +33,6 @@ class Sintomas {
 
   set temperatura(String value) {
     _temperatura = value;
-  }
-
-  String get urlImagem => _urlImagem;
-
-  set urlImagem(String value) {
-    _urlImagem = value;
   }
 
   String get descricao => _descricao;

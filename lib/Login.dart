@@ -10,12 +10,12 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  TextEditingController _controllerCarteiraSus = TextEditingController();
+  TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
   String _mensagemErro = "";
 
   _validarCampos() {
-    String carteiraSus = _controllerCarteiraSus.text.toString();
+    String carteiraSus = _controllerEmail.text.toString();
     String senha = _controllerSenha.text.toString();
 
     if (carteiraSus.isNotEmpty) {
@@ -25,7 +25,7 @@ class _LoginState extends State<Login> {
         });
 
         Usuario usuario = Usuario();
-        usuario.carteiraSus = carteiraSus;
+        usuario.email = carteiraSus;
         usuario.senha = senha;
 
         _autenticandoUsuario(usuario);
@@ -46,7 +46,7 @@ class _LoginState extends State<Login> {
 
     auth
         .signInWithEmailAndPassword(
-        email: usuario.carteiraSus, password: usuario.senha)
+        email: usuario.email, password: usuario.senha)
         .then((firebaserUser) {
       Navigator.pushReplacementNamed(context, "/home");
     }).catchError((error) {
@@ -96,13 +96,13 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
-                    controller: _controllerCarteiraSus,
+                    controller: _controllerEmail,
                     autofocus: true,
                     keyboardType: TextInputType.text,
                     style: TextStyle(fontSize: 20),
                     decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        hintText: "Carteira do SUS",
+                        hintText: "E-mail",
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(

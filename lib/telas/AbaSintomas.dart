@@ -1,4 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provalucas/classes/Sintomas.dart';
+import 'dart:io';
 
 class AbaSintomas extends StatefulWidget {
   @override
@@ -12,9 +18,144 @@ class _AbaSintomasState extends State<AbaSintomas> {
   bool _coriza = false;
   bool _tosse = false;
   bool _espirro = false;
-  double temperatura = 0;
-  String label = "0";
+  double temperatura = 36;
+  String label = "36";
   String _mensagemErro = "";
+  String numProtocolo = "0";
+  int contador = 0;
+
+  List<String> urlImagens = [];
+
+  File _imagem;
+  String _idUsuarioLogado = "";
+  String _urlImagemRecuperada;
+  bool _subindoImagem = false;
+
+  void _recuperaId() async {
+    List _itens = [];
+    Firestore db = Firestore.instance;
+    await db.collection("sintomas").getDocuments().then((querySnapshot) {
+      querySnapshot.documents.forEach((result) {
+        setState(() {
+          _itens.add(result.data);
+        });
+      });
+    });
+    print(_itens.length);
+    numProtocolo = _itens.length.toString();
+  }
+
+  Future _recuperarImagem(String origemImagem) async {
+    File imagemSelecionada;
+    switch (origemImagem) {
+      case "camera":
+        imagemSelecionada =
+        await ImagePicker.pickImage(source: ImageSource.camera);
+        _imagem = imagemSelecionada;
+        if (_imagem != null) {
+          _subindoImagem = true;
+          _uploadImagem();
+        }
+        break;
+      case "galeria":
+        imagemSelecionada =
+        await ImagePicker.pickImage(source: ImageSource.gallery);
+
+        break;
+    }
+    setState(() {
+      _imagem = imagemSelecionada;
+      if (_imagem != null) {
+        _subindoImagem = true;
+        _uploadImagem();
+        contador++;
+      }
+    });
+  }
+
+  Future _uploadImagem() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+
+    _idUsuarioLogado = usuarioLogado.uid;
+
+    FirebaseStorage storage = FirebaseStorage.instance;
+    StorageReference pastaRaiz = storage.ref();
+    StorageReference arquivo = pastaRaiz.child("imagens").child(_idUsuarioLogado +"-"+ numProtocolo +"-"+ contador.toString() + ".jpg");
+
+    StorageUploadTask task = arquivo.putFile(_imagem);
+
+    task.events.listen((StorageTaskEvent storageEvent) {
+      if (storageEvent.type == StorageTaskEventType.progress) {
+        setState(() {
+          _subindoImagem = true;
+        });
+      } else if (storageEvent.type == StorageTaskEventType.success) {
+        setState(() {
+          _subindoImagem = false;
+        });
+      }
+    });
+
+    task.onComplete.then((StorageTaskSnapshot snapshot) {
+      _recuperarUrlImagem(snapshot);
+    });
+  }
+
+  Future _recuperarUrlImagem(StorageTaskSnapshot snapshot) async {
+    String url = await snapshot.ref.getDownloadURL();
+    urlImagens.add(url);
+
+    setState(() {
+      _urlImagemRecuperada = url;
+    });
+  }
+
+  void _limparCampos(){
+    _controlerDescricao.text = "";
+    _febre = false;
+    _diarreia = false;
+    _coriza = false;
+    _tosse = false;
+    _espirro = false;
+    temperatura = 31;
+    label = "31";
+    _mensagemErro = "";
+    urlImagens = [];
+  }
+
+  _validaCampos() async {
+    if (_controlerDescricao.text.isNotEmpty) {
+      Firestore db = Firestore.instance;
+      FirebaseAuth auth = FirebaseAuth.instance;
+      FirebaseUser usuarioLogado = await auth.currentUser();
+
+      Sintomas sintomas = Sintomas();
+      sintomas.protocolo = numProtocolo;
+      sintomas.idUsuario = usuarioLogado.uid;
+      sintomas.descricao = _controlerDescricao.text.toString();
+      sintomas.febre = _febre;
+      sintomas.diarreia = _diarreia;
+      sintomas.coriza = _coriza;
+      sintomas.tosse = _tosse;
+      sintomas.espirro = _espirro;
+      sintomas.temperatura = temperatura.toString();
+      sintomas.urlImagens = urlImagens;
+      contador = 0;
+
+      db.collection("sintomas").add(sintomas.toMap());
+      _limparCampos();
+      _recuperaId();
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _recuperaId();
+    _limparCampos();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,6 +243,38 @@ class _AbaSintomasState extends State<AbaSintomas> {
                         label = novoValor.toString();
                       });
                     }),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    FlatButton(
+                      onPressed: () {
+                        _recuperarImagem("camera");
+                      },
+                      child: Text("Câmera"),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        _recuperarImagem("galeria");
+                      },
+                      child: Text("Galeria"),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 10, top: 16),
+                  child: RaisedButton(
+                      child: Text(
+                        "Registrar",
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                      color: Colors.red,
+                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32)),
+                      onPressed: () {
+                        _validaCampos();
+                      }),
+                ),
                 Center(
                   child: Text(
                     _mensagemErro,

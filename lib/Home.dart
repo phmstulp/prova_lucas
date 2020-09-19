@@ -1,9 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provalucas/Login.dart';
-import 'package:provalucas/telas/AbaContatos.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provalucas/classes/Usuario.dart';
 import 'package:provalucas/telas/AbaConsultas.dart';
-import 'package:provalucas/telas/AbaContatos.dart';
+import 'package:provalucas/telas/AbaMedico.dart';
 import 'package:provalucas/telas/AbaSintomas.dart';
 
 class Home extends StatefulWidget {
@@ -31,10 +32,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   }
 
-  _escolhaMenu(String itemEscolhido){
+  _escolhaMenu(String itemEscolhido) async {
     switch (itemEscolhido){
       case "Configurações":
-        //Navigator.pushReplacementNamed(context, "/configuracoes");
+
         break;
       case "Deslogar":
         _deslogarUsuario();
@@ -65,10 +66,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               text: "Sintomas",
             ),
             Tab(
-              text: "Contatos",
+              text: "Consultas",
             ),
             Tab(
-              text: "Consultas",
+              text: "Médico",
             )
           ],
         ),
@@ -90,7 +91,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       ),
       body: TabBarView(
           controller: _tabController,
-          children: <Widget>[AbaSintomas(), AbaContatos(), AbaConsultas()]),
+          children: <Widget>[AbaSintomas(), AbaConsultas(), AbaMedico()]),
     );
   }
 }
