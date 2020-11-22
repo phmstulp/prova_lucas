@@ -31,6 +31,28 @@ class _AbaConsultasState extends State<AbaConsultas> {
     });
   }
 
+  void _showDialog(Text conteudo) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // retorna um objeto do tipo Dialog
+        return AlertDialog(
+          title: new Text("Sintomas"),
+          content: conteudo,
+          actions: <Widget>[
+            // define os botões na base do dialogo
+            new FlatButton(
+              child: new Text("Fechar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,26 +61,25 @@ class _AbaConsultasState extends State<AbaConsultas> {
         child: ListView.builder(
             itemCount: _itens.length,
             itemBuilder: (context, indice) {
-              return ListTile(
+              return ListTile (
                 title: Text(_itens[indice]["protocolo"]),
-                subtitle: Text(_itens[indice]["descricao"] +
-                    "\n" +
-                    _itens[indice]["temperatura"] +
-                    "\n" +
-                    "Febre: " +
-                    _itens[indice]["febre"].toString() +
-                    " - " +
-                    "Diarréia: " +
-                    _itens[indice]["diarreia"].toString() +
-                    " - " +
-                    "Coriza: " +
-                    _itens[indice]["coriza"].toString() +
-                    " - " +
-                    "Tosse: " +
-                    _itens[indice]["tosse"].toString() +
-                    " - " +
-                    "Espirro: " +
-                    _itens[indice]["espirro"].toString()),
+                subtitle: Text(
+                    _itens[indice]["descricao"]
+                ),
+                contentPadding: EdgeInsets.all(9),
+                onTap: () {
+                  _showDialog(
+                      new Text(
+                          _itens[indice]["descricao"]
+                              +"\nTemperatura: "+ _itens[indice]["temperatura"]
+                              +"\nFebre: " + _itens[indice]["febre"].toString()
+                              +"\nDiarréia: " + _itens[indice]["diarreia"].toString()
+                              +"\nCoriza: " + _itens[indice]["coriza"].toString()
+                              +"\nTosse: " + _itens[indice]["tosse"].toString()
+                              +"\nEspirro: " + _itens[indice]["espirro"].toString()
+                      )
+                  );
+                },
               );
             }),
       ),
