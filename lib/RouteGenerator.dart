@@ -3,6 +3,8 @@ import 'package:provalucas/Mensagens.dart';
 import 'package:provalucas/Home.dart';
 import 'package:provalucas/Login.dart';
 import 'package:flutter/material.dart';
+import 'package:provalucas/SplashScreen.dart';
+import 'package:provalucas/telas/recuperasenha.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -18,6 +20,10 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => Cadastro());
       case "/home":
         return MaterialPageRoute(builder: (_) => Home());
+      case "/splash":
+        return MaterialPageRoute(builder: (_) => SplashScreen());
+      case "/recuperasenha":
+        return MaterialPageRoute(builder: (_) => RecuperaSenha());
       case "/mensagens":
         return MaterialPageRoute(builder: (_) => Mensagens(args));
       default:

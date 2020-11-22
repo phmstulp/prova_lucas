@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provalucas/classes/Sintomas.dart';
 import 'dart:io';
@@ -30,6 +33,10 @@ class _AbaSintomasState extends State<AbaSintomas> {
   String _idUsuarioLogado = "";
   String _urlImagemRecuperada;
   bool _subindoImagem = false;
+
+  Completer<GoogleMapController> _controller = Completer();
+  CameraPosition _position = CameraPosition(target: LatLng(-24.5518584, -54.0593179), zoom: 10);
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   void _recuperaId() async {
     List _itens = [];
@@ -149,12 +156,32 @@ class _AbaSintomasState extends State<AbaSintomas> {
     }
   }
 
+  _onMapCreate(GoogleMapController googleMapController) {
+    _controller.complete(googleMapController);
+  }
+
+  _recuperarLocalizacao() async {
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    final Marker marker = Marker(
+      markerId: MarkerId("marker"),
+      position: LatLng(position.latitude, position.longitude),
+      infoWindow: InfoWindow(title: 'Posicao: ' + position.latitude.toString() +' - '+ position.longitude.toString()),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+    );
+    setState(() {
+      _position = CameraPosition(target: LatLng(position.latitude, position.longitude), zoom: 10);
+      markers[MarkerId("marker")] = marker;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _recuperaId();
     _limparCampos();
+    _recuperarLocalizacao();
   }
 
   @override
@@ -279,6 +306,20 @@ class _AbaSintomasState extends State<AbaSintomas> {
                   child: Text(
                     _mensagemErro,
                     style: TextStyle(fontSize: 24, color: Colors.white),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text("Localização Atual", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Container(
+                  height: 300,
+                  child: GoogleMap(
+                      mapType: MapType.normal,
+                      initialCameraPosition: _position,
+                      onMapCreated: _onMapCreate,
+                      markers: Set<Marker>.of(markers.values)
                   ),
                 ),
               ],
