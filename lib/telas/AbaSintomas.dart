@@ -34,6 +34,8 @@ class _AbaSintomasState extends State<AbaSintomas> {
   String _urlImagemRecuperada;
   bool _subindoImagem = false;
 
+  String _mensagemLocalizacao = "";
+
   Completer<GoogleMapController> _controller = Completer();
   CameraPosition _position = CameraPosition(target: LatLng(-24.5518584, -54.0593179), zoom: 10);
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
@@ -163,6 +165,21 @@ class _AbaSintomasState extends State<AbaSintomas> {
   _recuperarLocalizacao() async {
     Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    List<Placemark> listaEnderecos = await Geolocator().placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark endereco = listaEnderecos[0];
+
+    String rua = endereco.thoroughfare;
+    String cep = endereco.postalCode;
+    String cidade = endereco.subAdministrativeArea ;
+    String estado = endereco.administrativeArea;
+    String nr = endereco.subThoroughfare;
+    String textomarker =
+        cep + "\n"
+            + rua + " - " + nr + "\n"
+            + cidade + " - " + estado;
+    setState(() {
+      _mensagemLocalizacao = textomarker;
+    });
     final Marker marker = Marker(
       markerId: MarkerId("marker"),
       position: LatLng(position.latitude, position.longitude),
@@ -311,6 +328,22 @@ class _AbaSintomasState extends State<AbaSintomas> {
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: Text("Localização Atual", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Container(
+                  height: 300,
+                  child: GoogleMap(
+                      mapType: MapType.normal,
+                      initialCameraPosition: _position,
+                      onMapCreated: _onMapCreate,
+                      markers: Set<Marker>.of(markers.values)
+                  ),
+                ),
+                Center(
+                  child: Text(
+                    _mensagemLocalizacao,
+                    style: TextStyle(fontSize: 24, color: Colors.black),
+                    textAlign: TextAlign.center,
                   ),
                 ),
                 Container(
